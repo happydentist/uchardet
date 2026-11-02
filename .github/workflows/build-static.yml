@@ -28,12 +28,13 @@ jobs:
     # -DBUILD_SHARED_LIBS=OFF：關閉動態連結庫(.dll)生成，只產生靜態庫
     - name: Configure CMake
       run: |
+        # 使用 PowerShell 的取代功能，直接將最低要求改為 3.5
+        (Get-Content CMakeLists.txt) -replace "cmake_minimum_required\(VERSION .*\)", "cmake_minimum_required(VERSION 3.5)" | Set-Content CMakeLists.txt
         mkdir build
         cd build
         cmake -DCMAKE_BUILD_TYPE=Release `
               -DBUILD_SHARED_LIBS=OFF `
               -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded `
-              -DCMAKE_POLICY_VERSION_MINIMUM=3.5 `
               ..
 
     # 4. 開始編譯 Release 版本的執行檔
