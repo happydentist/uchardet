@@ -33,6 +33,7 @@ jobs:
         cmake -DCMAKE_BUILD_TYPE=Release `
               -DBUILD_SHARED_LIBS=OFF `
               -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded `
+              -DCMAKE_POLICY_VERSION_MINIMUM=3.5 `
               ..
 
     # 4. 開始編譯 Release 版本的執行檔
