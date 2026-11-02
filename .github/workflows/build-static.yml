@@ -30,14 +30,24 @@ jobs:
       run: |
         # 使用 PowerShell 的取代功能，直接將最低要求改為 3.5
         (Get-Content CMakeLists.txt) -replace "cmake_minimum_required\(VERSION .*\)", "cmake_minimum_required(VERSION 3.5)" | Set-Content CMakeLists.txt
-        # 3.2 移除 Windows (MSVC) 下不需要且會報錯的 getopt.h
+
+        # 3.2 物理阻斷：直接用空字串取代掉載入 test 子目錄的指令，徹底讓 MSVC 不去編譯測試專案
+        (Get-Content CMakeLists.txt) -replace "add_subdirectory\(test\)", "" | Set-Content CMakeLists.txt
+
+        # 3.3 移除 Windows (MSVC) 下不需要且會報錯的 getopt.h
         (Get-Content src/tools/uchardet.cpp) -replace '#include <getopt.h>', '// #include <getopt.h>' | Set-Content src/tools/uchardet.cpp
+
         mkdir build
         cd build
+        # 關鍵參數：
+        # -DCMAKE_CXX_FLAGS="/w /D_CRT_SECURE_NO_WARNINGS" 代表關閉 C++ 所有警告且允許使用舊安全函式
+        # -DCMAKE_C_FLAGS="/w /D_CRT_SECURE_NO_WARNINGS" 代表關閉 C 所有警告
         cmake -DCMAKE_BUILD_TYPE=Release `
               -DBUILD_SHARED_LIBS=OFF `
               -DBUILD_TESTING=OFF `
               -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded `
+              -DCMAKE_CXX_FLAGS="/w /D_CRT_SECURE_NO_WARNINGS" `
+              -DCMAKE_C_FLAGS="/w /D_CRT_SECURE_NO_WARNINGS" `
               ..
 
     # 4. 開始編譯 Release 版本的執行檔
