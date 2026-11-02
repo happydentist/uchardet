@@ -30,8 +30,8 @@ jobs:
       run: |
         # 使用 PowerShell 的取代功能，直接將最低要求改為 3.5
         (Get-Content CMakeLists.txt) -replace "cmake_minimum_required\(VERSION .*\)", "cmake_minimum_required(VERSION 3.5)" | Set-Content CMakeLists.txt
-        # 3.2 解決 MSVC 缺少 getopt.h 的問題 (直接從 VCPKG 官方源下載獨立的 getopt.h 放入 src/tools 內)
-        Invoke-WebRequest -Uri "https://githubusercontent.com" -OutFile "src/tools/getopt.h"
+        # 3.2 移除 Windows (MSVC) 下不需要且會報錯的 getopt.h
+        (Get-Content src/tools/uchardet.cpp) -replace '#include <getopt.h>', '// #include <getopt.h>' | Set-Content src/tools/uchardet.cpp
         mkdir build
         cd build
         cmake -DCMAKE_BUILD_TYPE=Release `
